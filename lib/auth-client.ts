@@ -2,7 +2,7 @@ import { createAuthClient } from "better-auth/react";
 import { useState, useCallback } from "react";
 
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 });
 
 // hook for current user

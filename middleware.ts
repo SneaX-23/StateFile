@@ -1,5 +1,29 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+const PROTECTED_ROUTES = [
+  '/dashboard',
+];
+
+const AUTH_ROUTES = ['/login'];
+
+function isValidCallbackUrl(url: string): boolean {
+  try {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const parsed = new URL(url, appUrl);
+    return parsed.origin === new URL(appUrl).origin;
+  } catch {
+    return false;
+  }
+}
+
+function isProtectedRoute(pathname: string): boolean {
+  return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
+}
+
+function isAuthRoute(pathname: string): boolean {
+  return AUTH_ROUTES.some(route => pathname.startsWith(route));
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -11,22 +35,19 @@ export async function middleware(request: NextRequest) {
 
   const isAuthenticated = !!sessionToken;
 
-  const isAuthPage = pathname.startsWith('/login');
-
-  // routes that require authentication
-  const isProtectedRoute =
-    pathname.startsWith('/dashboard');
-
   // redirect unauthenticated users trying to access protected routes to /login
-  if (isProtectedRoute && !isAuthenticated) {
+  if (isProtectedRoute(pathname) && !isAuthenticated) {
     const loginUrl = new URL('/login', request.url);
-    // preserve the page to redirect back later
-    loginUrl.searchParams.set('callbackUrl', pathname);
+    // Only set callback URL if it's safe (same-origin)
+    if (isValidCallbackUrl(pathname)) {
+      loginUrl.searchParams.set('callbackUrl', pathname);
+    }
+
     return NextResponse.redirect(loginUrl);
   }
 
   // redirect authenticated users away from /login to /dashboard
-  if (isAuthPage && isAuthenticated) {
+  if (isAuthRoute(pathname) && isAuthenticated) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

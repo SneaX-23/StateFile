@@ -48,7 +48,9 @@ const dbPool = new Pool({
 
 export const auth = betterAuth({
   baseURL: process.env.NEXT_PUBLIC_APP_URL,
-
+  account: {
+    encryptOAuthTokens: true,
+  },
   database: dbPool,
 
   session: {

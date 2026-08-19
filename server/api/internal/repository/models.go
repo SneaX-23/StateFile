@@ -16,13 +16,13 @@ type Account struct {
 	Issuer                string
 	AccountId             string
 	ProviderId            string
-	AccessToken           pgtype.Text
-	RefreshToken          pgtype.Text
+	AccessToken           *string
+	RefreshToken          *string
 	AccessTokenExpiresAt  pgtype.Timestamptz
 	RefreshTokenExpiresAt pgtype.Timestamptz
-	Scope                 pgtype.Text
-	IdToken               pgtype.Text
-	Password              pgtype.Text
+	Scope                 *string
+	IdToken               *string
+	Password              *string
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
 }
@@ -32,8 +32,8 @@ type Session struct {
 	UserId    string
 	Token     string
 	ExpiresAt time.Time
-	IpAddress pgtype.Text
-	UserAgent pgtype.Text
+	IpAddress *string
+	UserAgent *string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -43,7 +43,7 @@ type User struct {
 	Name          string
 	Email         string
 	EmailVerified bool
-	Image         pgtype.Text
+	Image         *string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }

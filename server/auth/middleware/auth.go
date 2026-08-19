@@ -1,60 +1,50 @@
 package middleware
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/jackc/pgx/v5"
 )
 
-type AuthMiddleware struct {
-	jwtSecret []byte
-}
-
-func NewAuthMiddleware(secret string) *AuthMiddleware {
-	return &AuthMiddleware{jwtSecret: []byte(secret)}
-}
-
-func (a *AuthMiddleware) Authenticate() gin.HandlerFunc {
+func Authenticate(q *repository.Queries) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var token string
 		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing"})
-			return
-		}
-
-		parts := strings.Split(authHeader, " ")
-		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid authorization header format"})
-			return
-		}
-
-		tokenString := parts[1]
-
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		if strings.HasPrefix(authHeader, "Bearer ") {
+			token = strings.TrimPrefix(authHeader, "Bearer ")
+		} else {
+			sessionToken, err := c.Cookie("better-auth.session_token")
+			if err == nil {
+				token = sessionToken
 			}
-			return a.jwtSecret, nil
-		})
+		}
 
-		if err != nil || !token.Valid {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		if token == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: token missing"})
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token payload"})
+		sessionInfo, err := q.GetInfoFromSession(c, token)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: invalid token"})
+			} else {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+			}
 			return
 		}
 
-		if userID, ok := claims["sub"].(string); ok {
-			c.Set("userID", userID)
+		if time.Now().After(sessionInfo.ExpiresAt) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: session expired"})
+			return
 		}
 
+		c.Set("userId", sessionInfo.UserId)
 		c.Next()
 	}
 }

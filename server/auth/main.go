@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/SneaX-23/StateFile/server/auth/config"
+	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
 	"github.com/SneaX-23/StateFile/server/auth/middleware"
 
 	"github.com/gin-contrib/cors"
@@ -14,6 +16,18 @@ func main() {
 	if secret == "" {
 		panic("BETTER_AUTH_SECRET environment variable is required")
 	}
+	databseUrl := os.Getenv("DATABASE_URL")
+	if databseUrl == "" {
+		panic("DATABASE_URL environment variable is required")
+	}
+
+	db, err := config.NewDatabase(databseUrl)
+	if err != nil {
+		panic("failed to connect to databse")
+	}
+	defer db.Close()
+
+	queries := repository.New(db.Pool)
 
 	r := gin.New()
 	r.Use(gin.Recovery(), middleware.SecurityHeaders())
@@ -24,10 +38,8 @@ func main() {
 	corsConfig.AllowCredentials = true
 	r.Use(cors.New(corsConfig))
 
-	authMiddleware := middleware.NewAuthMiddleware(secret)
-
 	api := r.Group("/api/v1")
-	api.Use(authMiddleware.Authenticate())
+	api.Use(middleware.Authenticate(queries))
 
 	r.Run(":8080")
 }

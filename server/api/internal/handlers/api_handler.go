@@ -24,7 +24,7 @@ func NewHandler(q *repository.Queries) *Handler {
 	}
 }
 
-func (h *Handler) getRepos(c *gin.Context) {
+func (h *Handler) GetRepos(c *gin.Context) {
 	// get userId that middleware set
 	userId, exists := c.Get("userId")
 	// check if exists or not
@@ -77,11 +77,13 @@ func (h *Handler) getRepos(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
+	// handle github error responses
 	if resp.StatusCode != http.StatusOK {
 		c.AbortWithStatusJSON(resp.StatusCode, gin.H{"error": fmt.Sprintf("GitHub API returned status %s", resp.Status)})
 		return
 	}
 
+	// minimal struct to capture only the repo names
 	type GitHubRepo struct {
 		Name string `json:"name"`
 	}

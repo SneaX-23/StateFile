@@ -57,7 +57,7 @@ func (h *Handler) GetRepos(c *gin.Context) {
 	}
 
 	// create the github request using gin's request context
-	req, err := http.NewRequestWithContext(c.Request.Context(), "GET", "https://github.com", nil)
+	req, err := http.NewRequestWithContext(c.Request.Context(), "GET", "https://api.github.com/user/repos", nil)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to build upstream request"})
 		return
@@ -85,6 +85,7 @@ func (h *Handler) GetRepos(c *gin.Context) {
 
 	// minimal struct to capture only the repo names
 	type GitHubRepo struct {
+		ID   int64  `json:"id"`
 		Name string `json:"name"`
 	}
 
@@ -94,10 +95,10 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		return
 	}
 
-	repoNames := make([]string, len(githubRepos))
-	for i, repo := range githubRepos {
-		repoNames[i] = repo.Name
-	}
+	// repoNames := make([]string, len(githubRepos))
+	// for i, repo := range githubRepos {
+	// 	repoNames[i] = repo.Name
+	// }
 
-	c.JSON(http.StatusOK, gin.H{"repositories": repoNames})
+	c.JSON(http.StatusOK, gin.H{"repositories": githubRepos})
 }

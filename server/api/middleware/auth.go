@@ -23,12 +23,11 @@ func Authenticate(q *repository.Queries) gin.HandlerFunc {
 				token = sessionToken
 			}
 		}
-
 		if token == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: token missing"})
 			return
 		}
-
+		token = strings.Split(token, ".")[0]
 		sessionInfo, err := q.GetInfoFromSession(c, token)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {

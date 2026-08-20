@@ -16,7 +16,9 @@ export async function apiFetch<T>(
   );
 
   if (!response.ok) {
-    throw new Error('API request failed');
+    const errorText = await response.text();
+    console.error(`API Error (${response.status}):`, errorText);
+    throw new Error(`API request failed: ${response.status}`);
   }
 
   return response.json();

@@ -95,10 +95,5 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		return
 	}
 
-	// repoNames := make([]string, len(githubRepos))
-	// for i, repo := range githubRepos {
-	// 	repoNames[i] = repo.Name
-	// }
-
 	c.JSON(http.StatusOK, gin.H{"repositories": githubRepos})
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/SneaX-23/StateFile/server/auth/config"
@@ -10,9 +11,13 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Panicln("No .env file found")
+	}
 	secret := os.Getenv("BETTER_AUTH_SECRET")
 	if secret == "" {
 		panic("BETTER_AUTH_SECRET environment variable is required")
@@ -31,7 +36,7 @@ func main() {
 	queries := repository.New(db.Pool)
 	handler := handlers.NewHandler(queries)
 	r := gin.New()
-	r.Use(gin.Recovery(), middleware.SecurityHeaders())
+	r.Use(gin.Logger(), gin.Recovery(), middleware.SecurityHeaders())
 
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowOrigins = []string{"http://localhost:3000"}

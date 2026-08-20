@@ -5,18 +5,6 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 });
 
-// hook for current user
-export function useCurrentUser() {
-  const { data: session } = authClient.useSession();
-  return session?.user ?? null;
-}
-
-// hook for authentication status
-export function useIsAuthenticated() {
-  const user = useCurrentUser();
-  return !!user;
-}
-
 
 // unused for now
 // export const signInWithGitHub = async () => {
@@ -32,23 +20,3 @@ export function useIsAuthenticated() {
 //     callbackURL: "/dashboard"
 //   })
 // }
-
-
-// hook for signOut
-export function useSignOut() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const signOut = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      await authClient.signOut();
-    } catch (err) {
-      console.error("Sign-out error:", err);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return { signOut, isLoading };
-}

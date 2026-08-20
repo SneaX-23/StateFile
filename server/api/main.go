@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/SneaX-23/StateFile/server/auth/config"
+	"github.com/SneaX-23/StateFile/server/auth/internal/handlers"
 	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
 	"github.com/SneaX-23/StateFile/server/auth/middleware"
 
@@ -28,7 +29,7 @@ func main() {
 	defer db.Close()
 
 	queries := repository.New(db.Pool)
-
+	handler := handlers.NewHandler(queries)
 	r := gin.New()
 	r.Use(gin.Recovery(), middleware.SecurityHeaders())
 
@@ -40,6 +41,6 @@ func main() {
 
 	api := r.Group("/api/v1")
 	api.Use(middleware.Authenticate(queries))
-
+	api.GET("/get-repos", handler.GetRepos)
 	r.Run(":8080")
 }

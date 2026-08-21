@@ -4,6 +4,75 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+@theme {
+  --font-display: var(--font-space-grotesk);
+  --font-mono: var(--font-ibm-plex-mono);
+  --font-sans: var(--font-inter);
+ 
+  --color-blueprint-950: #081a35; /* deepest background */
+  --color-blueprint-900: #0d2a52; /* base background */
+  --color-blueprint-800: #123b6e; /* panels */
+  --color-blueprint-700: #1c4d86; /* borders / mid linework */
+  --color-blueprint-500: #3d6fa8; /* linework */
+  --color-blueprint-400: #6f97c9; /* faint linework / muted text */
+  --color-blueprint-200: #cfe0f5; /* near-white ink */
+  --color-blueprint-100: #e8f0fb; /* spec-plate fill */
+ 
+  --color-stamp: #c1442d;
+  --color-stamp-light: #e2603f;
+
+ /* text animations*/
+  --animate-glitch-main: glitch-main 1s linear infinite;
+  --animate-glitch-top: glitch-top 1s linear infinite;
+  --animate-glitch-bottom: glitch-bottom 1.5s linear infinite;
+  --animate-typewriter: typewriter 1.2s steps(10) forwards infinite;
+  --animate-stamp: stamp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s backwards;
+
+  --background-image-blueprint-radial: radial-gradient(
+    120% 90% at 50% 38%,
+    #123f78 0%,
+    #0d2a52 45%,
+    #081a35 100%
+  );
+}
+
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    scale: 2;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes typewriter {
+  0% {
+    clip-path: inset(0 100% 0 0); 
+  }
+  100% { 
+    clip-path: inset(0 0 0 0); 
+  }
+}
+@keyframes glitch-main {
+  2%, 64% { transform: translate(2px, 0) skew(0deg); }
+  4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+  62% { transform: translate(0, 0) skew(5deg); }
+}
+
+@keyframes glitch-top {
+  2%, 64% { transform: translate(2px, -2px); }
+  4%, 60% { transform: translate(-2px, 2px); }
+  62% { transform: translate(13px, -1px) skew(-13deg); }
+}
+
+@keyframes glitch-bottom {
+  2%, 64% { transform: translate(-2px, 0); }
+  4%, 60% { transform: translate(-2px, 0); }
+  62% { transform: translate(-22px, 5px) skew(21deg); }
+}
+
 
 @theme inline {
   --color-background: var(--background);
@@ -19,6 +88,14 @@
   }
 }
 
+html {
+  color-scheme: dark;
+}
+ 
+::selection {
+  background-color: #6f97c9;
+  color: #081a35;
+}
 body {
   background: var(--background);
   color: var(--foreground);

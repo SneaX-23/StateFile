@@ -9,21 +9,28 @@ export default function GetRepos() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState<number>(1)
 
   const handleClick = async () => {
     try {
       setIsLoading(true);
       setError(null);
-
       const data = await apiFetch<{ repositories: Repo[] }>(
-        '/api/v1/get-repos',
+        `/api/v1/get-repos?page=${page}`,
         {
           method: 'GET',
           credentials: 'include',
         }
       );
 
-      setRepos(data.repositories);
+      setRepos((prevRepos) =>
+        [
+          ...prevRepos,
+          ...data.repositories,
+        ]
+      );
+      setPage((prevPage) => prevPage + 1)
+
       setIsOpen(true);
     } catch (error) {
       console.error('Failed to fetch repositories:', error);

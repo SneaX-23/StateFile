@@ -45,7 +45,7 @@ export default function GetRepos() {
       <button
         onClick={handleClick}
         disabled={isLoading}
-        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#e24329]/10 hover:bg-[#e24329]/20 border border-[#e24329]/30 rounded-lg text-sm font-medium text-white transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
+        className="w-full flex items-center justify-center gap-3 px-2 py-1 hover:bg-zinc-900 border border-zinc-500 rounded-lg text-sm font-medium text-white  hover:text-blueprint-400 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
       >
         <span>
           {isLoading ? 'Fetching repositories...' : 'Get Repos'}

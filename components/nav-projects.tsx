@@ -17,6 +17,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { MoreHorizontalIcon, FolderIcon, ArrowRightIcon, Trash2Icon } from "lucide-react"
+import GetRepos from "./dashboard/get-repos"
 
 export function NavProjects({
   projects,
@@ -76,12 +77,13 @@ export function NavProjects({
             </DropdownMenu>
           </SidebarMenuItem>
         ))}
-        <SidebarMenuItem>
-          <SidebarMenuButton className="text-sidebar-foreground/70">
-            <MoreHorizontalIcon className="text-sidebar-foreground/70" />
-            <span>More</span>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+        <GetRepos />
+        {/* <SidebarMenuItem> */}
+        {/*   <SidebarMenuButton className="text-sidebar-foreground/70"> */}
+        {/*     <MoreHorizontalIcon className="text-sidebar-foreground/70" /> */}
+        {/*     <span>More</span> */}
+        {/*   </SidebarMenuButton> */}
+        {/* </SidebarMenuItem> */}
       </SidebarMenu>
     </SidebarGroup>
   )

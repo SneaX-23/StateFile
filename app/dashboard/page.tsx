@@ -42,7 +42,6 @@ export default function Page() {
             {/* </Breadcrumb> */}
           </div>
         </header>
-        <GetRepos />
       </SidebarInset>
     </SidebarProvider>
   )

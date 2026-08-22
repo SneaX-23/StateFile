@@ -103,7 +103,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleSignOut} disabled={isLoading}>
+            <DropdownMenuItem onClick={handleSignOut} disabled={isLoading} className={"hover:text-blueprint-400"}>
               <LogOutIcon
               />
               <span>{isLoading ? "Logging out..." : "Log out"}</span>

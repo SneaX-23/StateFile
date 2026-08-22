@@ -85,10 +85,12 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		return
 	}
 
-	// minimal struct to capture only the repo names
+	// minimal struct to capture repo info
 	type GitHubRepo struct {
-		ID   int64  `json:"id"`
-		Name string `json:"name"`
+		ID    int64  `json:"id"`
+		Name  string `json:"name"`
+		Stars int64  `json:"stargazers_count"`
+		Forks int64  `json:"forks_count"`
 	}
 
 	var githubRepos []GitHubRepo

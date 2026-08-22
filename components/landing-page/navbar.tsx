@@ -21,7 +21,6 @@ export default function Navbar() {
           </svg>
           <span className="font-display text-lg font-semibold tracking-tight text-blueprint-100">
             StateFile
-            <span className="font-mono text-sm font-normal text-blueprint-400">.tfstate</span>
           </span>
         </div>
 

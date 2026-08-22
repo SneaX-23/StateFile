@@ -56,8 +56,10 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		return
 	}
 
+	page := c.DefaultQuery("page", "1")
+	githubUrl := fmt.Sprintf("https://api.github.com/user/repos?per_page=50&page=%s", page)
 	// create the github request using gin's request context
-	req, err := http.NewRequestWithContext(c.Request.Context(), "GET", "https://api.github.com/user/repos", nil)
+	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodGet, githubUrl, nil)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to build upstream request"})
 		return

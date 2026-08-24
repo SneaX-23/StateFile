@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
@@ -45,19 +46,19 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		}
 		return
 	}
-	if encryptedToken == nil {
+	if encryptedToken.AccessToken == nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized: token is null"})
 		return
 	}
 	// decrypt the token using BETTER_AUTH_SECRET
-	decryptedToken, err := util.DecryptBetterAuthAccessToken(*encryptedToken, os.Getenv("BETTER_AUTH_SECRET"))
+	decryptedToken, err := util.DecryptBetterAuthAccessToken(*encryptedToken.AccessToken, os.Getenv("BETTER_AUTH_SECRET"))
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Failed to decrypt access token"})
 		return
 	}
-
 	page := c.DefaultQuery("page", "1")
-	githubUrl := fmt.Sprintf("https://api.github.com/user/repos?per_page=50&page=%s", page)
+	// get user owned and most recently updated repositories
+	githubUrl := fmt.Sprintf("https://api.github.com/user/repos?type=owner&sort=updated&direction=desc&per_page=50&page=%s", page)
 	// create the github request using gin's request context
 	req, err := http.NewRequestWithContext(c.Request.Context(), http.MethodGet, githubUrl, nil)
 	if err != nil {
@@ -99,5 +100,11 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"repositories": githubRepos})
+	linkHeader := resp.Header.Get("Link")
+	hasMore := strings.Contains(linkHeader, `rel="next"`)
+
+	c.JSON(http.StatusOK, gin.H{
+		"repositories": githubRepos,
+		"hasMore":      hasMore,
+	})
 }

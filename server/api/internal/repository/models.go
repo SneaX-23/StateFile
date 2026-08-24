@@ -12,16 +12,15 @@ import (
 
 type Account struct {
 	ID                    string
-	UserId                string
-	Issuer                string
 	AccountId             string
 	ProviderId            string
+	UserId                string
 	AccessToken           *string
 	RefreshToken          *string
+	IdToken               *string
 	AccessTokenExpiresAt  pgtype.Timestamptz
 	RefreshTokenExpiresAt pgtype.Timestamptz
 	Scope                 *string
-	IdToken               *string
 	Password              *string
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
@@ -29,13 +28,13 @@ type Account struct {
 
 type Session struct {
 	ID        string
-	UserId    string
-	Token     string
 	ExpiresAt time.Time
-	IpAddress *string
-	UserAgent *string
+	Token     string
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	IpAddress *string
+	UserAgent *string
+	UserId    string
 }
 
 type User struct {

@@ -10,12 +10,17 @@ import (
 )
 
 const getAccessToken = `-- name: GetAccessToken :one
-SELECT "accessToken" FROM account WHERE "userId" = $1
+SELECT "accessToken", "providerId" FROM account WHERE "userId" = $1
 `
 
-func (q *Queries) GetAccessToken(ctx context.Context, userid string) (*string, error) {
+type GetAccessTokenRow struct {
+	AccessToken *string
+	ProviderId  string
+}
+
+func (q *Queries) GetAccessToken(ctx context.Context, userid string) (GetAccessTokenRow, error) {
 	row := q.db.QueryRow(ctx, getAccessToken, userid)
-	var accessToken *string
-	err := row.Scan(&accessToken)
-	return accessToken, err
+	var i GetAccessTokenRow
+	err := row.Scan(&i.AccessToken, &i.ProviderId)
+	return i, err
 }

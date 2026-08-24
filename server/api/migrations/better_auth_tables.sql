@@ -1,50 +1,49 @@
-CREATE TABLE IF NOT EXISTS "user" (
-	"id" text NOT NULL PRIMARY KEY,
-	"name" text NOT NULL,
-	"email" text NOT NULL UNIQUE,
-	"emailVerified" boolean NOT NULL,
-	"image" text,
-	"createdAt" timestamptz NOT NULL,
-	"updatedAt" timestamptz NOT NULL
+create table "user" (
+  "id" text not null primary key,
+  "name" text not null,
+  "email" text not null unique,
+  "emailVerified" boolean not null,
+  "image" text,
+  "createdAt" timestamptz default CURRENT_TIMESTAMP not null,
+  "updatedAt" timestamptz default CURRENT_TIMESTAMP not null
 );
 
-CREATE TABLE IF NOT EXISTS "session" (
-	"id" text NOT NULL PRIMARY KEY,
-	"userId" text NOT NULL,
-	"token" text NOT NULL UNIQUE,
-	"expiresAt" timestamptz NOT NULL,
-	"ipAddress" text,
-	"userAgent" text,
-	"createdAt" timestamptz NOT NULL,
-	"updatedAt" timestamptz NOT NULL,
-	FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE CASCADE
+create table "session" (
+  "id" text not null primary key,
+  "expiresAt" timestamptz not null,
+  "token" text not null unique,
+  "createdAt" timestamptz default CURRENT_TIMESTAMP not null,
+  "updatedAt" timestamptz not null,
+  "ipAddress" text,
+  "userAgent" text,
+  "userId" text not null references "user" ("id") on delete cascade
 );
 
-CREATE TABLE IF NOT EXISTS "account" (
-	"id" text NOT NULL PRIMARY KEY,
-	"userId" text NOT NULL,
-	"issuer" text NOT NULL,
-	"accountId" text NOT NULL,
-	"providerId" text NOT NULL,
-	"accessToken" text,
-	"refreshToken" text,
-	"accessTokenExpiresAt" timestamptz,
-	"refreshTokenExpiresAt" timestamptz,
-	"scope" text,
-	"idToken" text,
-	"password" text,
-	"createdAt" timestamptz NOT NULL,
-	"updatedAt" timestamptz NOT NULL,
-	FOREIGN KEY ("userId") REFERENCES "user" ("id") ON DELETE CASCADE
+create table "account" ("id" text not null primary key,
+  "accountId" text not null,
+  "providerId" text not null,
+  "userId" text not null references "user" ("id") on delete cascade,
+  "accessToken" text,
+  "refreshToken" text,
+  "idToken" text,
+  "accessTokenExpiresAt" timestamptz,
+  "refreshTokenExpiresAt" timestamptz,
+  "scope" text,
+  "password" text,
+  "createdAt" timestamptz default CURRENT_TIMESTAMP not null,
+  "updatedAt" timestamptz not null
 );
 
-CREATE TABLE IF NOT EXISTS "verification" (
-	"id" text NOT NULL PRIMARY KEY,
-	"identifier" text NOT NULL,
-	"value" text NOT NULL,
-	"expiresAt" timestamptz NOT NULL,
-	"createdAt" timestamptz NOT NULL,
-	"updatedAt" timestamptz NOT NULL
+create table "verification" ("id" text not null primary key,
+  "identifier" text not null,
+  "value" text not null,
+  "expiresAt" timestamptz not null,
+  "createdAt" timestamptz default CURRENT_TIMESTAMP not null,
+  "updatedAt" timestamptz default CURRENT_TIMESTAMP not null
 );
 
+create index "session_userId_idx" on "session" ("userId");
 
+create index "account_userId_idx" on "account" ("userId");
+
+create index "verification_identifier_idx" on "verification" ("identifier");

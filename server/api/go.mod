@@ -1,4 +1,4 @@
-module github.com/SneaX-23/StateFile/server/auth
+module github.com/SneaX-23/StateFile/server/api
 
 go 1.26.5
 

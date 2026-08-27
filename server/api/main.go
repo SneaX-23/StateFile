@@ -4,10 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/SneaX-23/StateFile/server/auth/config"
-	"github.com/SneaX-23/StateFile/server/auth/internal/handlers"
-	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
-	"github.com/SneaX-23/StateFile/server/auth/middleware"
+	"github.com/SneaX-23/StateFile/server/api/config"
+	"github.com/SneaX-23/StateFile/server/api/internal/handlers"
+	"github.com/SneaX-23/StateFile/server/api/internal/repository"
+	"github.com/SneaX-23/StateFile/server/api/internal/service"
+	"github.com/SneaX-23/StateFile/server/api/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -34,7 +35,8 @@ func main() {
 	defer db.Close()
 
 	queries := repository.New(db.Pool)
-	handler := handlers.NewHandler(queries)
+	service := service.NewApiService(queries)
+	handler := handlers.NewHandler(service)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middleware.SecurityHeaders())
 

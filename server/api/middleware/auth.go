@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SneaX-23/StateFile/server/auth/internal/repository"
+	"github.com/SneaX-23/StateFile/server/api/internal/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
 )

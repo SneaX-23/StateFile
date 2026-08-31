@@ -69,4 +69,18 @@ export const auth = betterAuth({
       clientSecret: process.env.GITLAB_CLIENT_SECRET!,
     },
   },
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await dbPool.query(
+            `
+              INSERT INTO user_profiles (userId, tier, allowedRepos)
+              VALUES ($1, 'free', 3);
+            `, [user.id]
+          )
+        }
+      }
+    }
+  }
 });

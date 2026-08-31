@@ -75,7 +75,7 @@ export const auth = betterAuth({
         after: async (user) => {
           await dbPool.query(
             `
-              INSERT INTO user_profiles (userId, tier, allowedRepos)
+              INSERT INTO user_profiles ("userId","tier", "allowedRepos")
               VALUES ($1, 'free', 3);
             `, [user.id]
           )

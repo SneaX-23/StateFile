@@ -5,11 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/SneaX-23/StateFile/server/api/internal/repository"
 	"github.com/SneaX-23/StateFile/server/api/internal/util"
 )
 
@@ -59,7 +61,7 @@ func (s *ApiService) GetReposService(ctx context.Context, userId string, page in
 			return nil, false, err
 		}
 
-		// set required GitHub headers
+		// set required github headers
 		req.Header.Set("Accept", "application/vnd.github+json")
 		req.Header.Set("Authorization", "Bearer "+decryptedToken)
 		req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
@@ -151,4 +153,52 @@ func (s *ApiService) GetReposService(ctx context.Context, userId string, page in
 	}
 
 	return repos, hasMore, nil
+}
+
+type Repositories struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (s *ApiService) ImportReposService(ctx context.Context, userId string, repos []Repositories) (int64, error) {
+	repoLimit, err := s.repo.CheckRepoLimit(ctx, userId)
+	if err != nil {
+		return 0, err
+	}
+	if repoLimit <= 0 || len(repos) > int(repoLimit) {
+		return 0, fmt.Errorf("repo import limit reached")
+	}
+	var repoInserted int64
+
+	err = s.repo.ExecTx(ctx, func(q *repository.Queries) error {
+		newLimit, err := q.DecrementRepoLimit(ctx, repository.DecrementRepoLimitParams{
+			AllowedRepos: int32(len(repos)),
+			UserId:       userId,
+		})
+		if err != nil {
+			return err
+		}
+		log.Printf("allowedRepos after decrement: %d", newLimit)
+		params := make([]repository.AddReposParams, len(repos))
+		for i, repo := range repos {
+			params[i] = repository.AddReposParams{
+				UserId:       userId,
+				GithubRepoId: repo.Id,
+				RepoName:     repo.Name,
+			}
+		}
+
+		inserted, err := q.AddRepos(ctx, params)
+		if err != nil {
+			return err
+		}
+
+		repoInserted = inserted
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return repoInserted, nil
 }

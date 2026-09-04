@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/SneaX-23/StateFile/server/api/config"
 	"github.com/SneaX-23/StateFile/server/api/internal/handlers"
@@ -34,8 +36,8 @@ func main() {
 	}
 	defer db.Close()
 
-	queries := repository.New(db.Pool)
-	service := service.NewApiService(queries)
+	store := repository.NewStore(db.Pool)
+	service := service.NewApiService(store)
 	handler := handlers.NewHandler(service)
 	r := gin.New()
 	r.Use(gin.Logger(), gin.Recovery(), middleware.SecurityHeaders())
@@ -47,7 +49,13 @@ func main() {
 	r.Use(cors.New(corsConfig))
 
 	api := r.Group("/api/v1")
-	api.Use(middleware.Authenticate(queries))
+	api.Use(middleware.Authenticate(store.Queries))
 	api.GET("/get-repos", handler.GetRepos)
+	api.POST("/import-repos", handler.ImportRepos)
+
 	r.Run(":8080")
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 }

@@ -9,6 +9,16 @@ import (
 	"context"
 )
 
+const checkRepoLimit = `-- name: CheckRepoLimit :one
+SELECT "allowedRepos" from user_profiles WHERE "userId" = $1
+`
+
+func (q *Queries) CheckRepoLimit(ctx context.Context, userid string) (int32, error) {
+	row := q.db.QueryRow(ctx, checkRepoLimit, userid)
+	var allowedRepos int32
+	err := row.Scan(&allowedRepos)
+	return allowedRepos, err
+}
 const getAccessToken = `-- name: GetAccessToken :one
 SELECT "accessToken", "providerId" FROM account WHERE "userId" = $1
 `

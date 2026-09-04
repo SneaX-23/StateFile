@@ -26,6 +26,17 @@ type Account struct {
 	UpdatedAt             time.Time
 }
 
+type Repository struct {
+	ID            pgtype.UUID
+	UserId        string
+	GithubRepoId  int64
+	RepoName      string
+	DefaultBranch *string
+	IsActive      *bool
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
+}
+
 type Session struct {
 	ID        string
 	ExpiresAt time.Time
@@ -45,6 +56,15 @@ type User struct {
 	Image         *string
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
+}
+
+type UserProfile struct {
+	ID           pgtype.UUID
+	UserId       string
+	Tier         string
+	AllowedRepos int32
+	CreatedAt    pgtype.Timestamptz
+	UpdatedAt    pgtype.Timestamptz
 }
 
 type Verification struct {

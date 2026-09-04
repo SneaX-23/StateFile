@@ -9,6 +9,12 @@ import (
 	"context"
 )
 
+type AddReposParams struct {
+	UserId       string
+	GithubRepoId int64
+	RepoName     string
+}
+
 const checkRepoLimit = `-- name: CheckRepoLimit :one
 SELECT "allowedRepos" from user_profiles WHERE "userId" = $1
 `
@@ -19,6 +25,26 @@ func (q *Queries) CheckRepoLimit(ctx context.Context, userid string) (int32, err
 	err := row.Scan(&allowedRepos)
 	return allowedRepos, err
 }
+
+const decrementRepoLimit = `-- name: DecrementRepoLimit :one
+UPDATE user_profiles
+SET "allowedRepos" = "allowedRepos" - $1
+WHERE "userId" = $2 AND "allowedRepos" >= $1
+RETURNING "allowedRepos"
+`
+
+type DecrementRepoLimitParams struct {
+	AllowedRepos int32
+	UserId       string
+}
+
+func (q *Queries) DecrementRepoLimit(ctx context.Context, arg DecrementRepoLimitParams) (int32, error) {
+	row := q.db.QueryRow(ctx, decrementRepoLimit, arg.AllowedRepos, arg.UserId)
+	var allowedRepos int32
+	err := row.Scan(&allowedRepos)
+	return allowedRepos, err
+}
+
 const getAccessToken = `-- name: GetAccessToken :one
 SELECT "accessToken", "providerId" FROM account WHERE "userId" = $1
 `

@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -45,4 +47,29 @@ func (h *Handler) GetRepos(c *gin.Context) {
 		"repositories": repos,
 		"hasMore":      hasMore,
 	})
+}
+
+func (h *Handler) ImportRepos(c *gin.Context) {
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found in context"})
+		return
+	}
+
+	type ImportPayload struct {
+		Repos []service.Repositories `json:"repositories"`
+	}
+	var payload ImportPayload
+
+	err := json.NewDecoder(c.Request.Body).Decode(&payload)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	reposAdded, err := h.apiService.ImportReposService(c.Request.Context(), userId.(string), payload.Repos)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": "success", "message": fmt.Sprintf("Successfully imported %d repositories.", reposAdded)})
 }

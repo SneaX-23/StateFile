@@ -21,7 +21,7 @@ const data = {
   user: {
     name: "Jhon Elden",
     email: "jhon@elden.lord.com",
-    avatar: "/avatar/shadcn.png",
+    avatar: "/file.svg",
   },
   teams: [
     {

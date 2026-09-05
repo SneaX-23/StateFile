@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronsUpDownIcon, SparklesIcon, BadgeCheckIcon, CreditCardIcon, BellIcon, LogOutIcon } from "lucide-react"
 import { useSignOut } from "@/hooks/use-sign-out"
-import { useRouter } from "next/navigation"
+import { redirect } from "next/navigation"
 
 export function NavUser({
   user,
@@ -35,12 +35,11 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const { signOut, isLoading } = useSignOut()
-  const router = useRouter()
 
   const handleSignOut = async () => {
     try {
       await signOut()
-      router.push("/login")
+      redirect("/login")
     } catch (error) {
       console.error("Sign-out error:", error);
       throw error;

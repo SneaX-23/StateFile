@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/app-sidebar"
-import GetRepos from "@/components/dashboard/get-repos"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,11 +13,24 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { Repo } from "@/types/repos"
+import { apiFetch } from '@/lib/api';
 
-export default function Page() {
+async function getProjects(): Promise<Repo[]> {
+  const data = await apiFetch<{ projects: Repo[] }>('api/v1/get-projects',
+    {
+      method: "GET",
+      credentials: 'include',
+      cache: 'no-store',
+    })
+  return data.projects
+}
+
+export default async function Page() {
+  const projects = await getProjects();
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar projects={projects} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">

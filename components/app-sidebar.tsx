@@ -13,15 +13,16 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon } from "lucide-react"
+import { GalleryVerticalEndIcon, AudioLinesIcon, TerminalIcon, TerminalSquareIcon, BotIcon, BookOpenIcon, Settings2Icon, FrameIcon, PieChartIcon, MapIcon, Folder } from "lucide-react"
 import { useCurrentUser } from "@/hooks/use-current-user"
+import { Repo } from "@/types/repos"
 
 // This is sample data.
 const data = {
   user: {
     name: "Jhon Elden",
     email: "jhon@elden.lord.com",
-    avatar: "/file.svg",
+    avatar: "/window.svg",
   },
   teams: [
     {
@@ -175,10 +176,15 @@ const data = {
     },
   ],
 }
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  projects?: Repo[]
+}
+export function AppSidebar({ projects = [], ...props }: AppSidebarProps) {
   const user = useCurrentUser()
-
+  const formatedProjects = projects.map((p) => ({
+    name: p.name,
+    icon: <Folder />,
+  }))
   return (
     <Sidebar collapsible="icon" {...props}>
       {/* <SidebarHeader> */}
@@ -186,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* </SidebarHeader> */}
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavProjects projects={formatedProjects} />
       </SidebarContent>
       <SidebarFooter>
         {user && (

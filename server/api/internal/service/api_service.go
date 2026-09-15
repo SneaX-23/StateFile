@@ -202,3 +202,18 @@ func (s *ApiService) ImportReposService(ctx context.Context, userId string, repo
 
 	return repoInserted, nil
 }
+
+func (s *ApiService) GetProjectsService(ctx context.Context, userId string) ([]Repositories, error) {
+	projects, err := s.repo.GetProjects(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	formatedProjects := make([]Repositories, len(projects))
+	for i, project := range projects {
+		formatedProjects[i] = Repositories{
+			Id:   project.GithubRepoId,
+			Name: project.RepoName,
+		}
+	}
+	return formatedProjects, nil
+}

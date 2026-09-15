@@ -11,5 +11,6 @@ type ApiRepository interface {
 	CheckRepoLimit(ctx context.Context, userid string) (int32, error)
 	AddRepos(ctx context.Context, arg []repository.AddReposParams) (int64, error)
 	DecrementRepoLimit(ctx context.Context, arg repository.DecrementRepoLimitParams) (int32, error)
+	GetProjects(ctx context.Context, userid string) ([]repository.GetProjectsRow, error)
 	ExecTx(ctx context.Context, fn func(*repository.Queries) error) error
 }

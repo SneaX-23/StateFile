@@ -60,3 +60,32 @@ func (q *Queries) GetAccessToken(ctx context.Context, userid string) (GetAccessT
 	err := row.Scan(&i.AccessToken, &i.ProviderId)
 	return i, err
 }
+
+const getProjects = `-- name: GetProjects :many
+SELECT "githubRepoId", "repoName" FROM repositories WHERE "userId" = $1
+`
+
+type GetProjectsRow struct {
+	GithubRepoId int64
+	RepoName     string
+}
+
+func (q *Queries) GetProjects(ctx context.Context, userid string) ([]GetProjectsRow, error) {
+	rows, err := q.db.Query(ctx, getProjects, userid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetProjectsRow
+	for rows.Next() {
+		var i GetProjectsRow
+		if err := rows.Scan(&i.GithubRepoId, &i.RepoName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

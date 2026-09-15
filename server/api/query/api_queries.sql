@@ -18,3 +18,5 @@ INSERT INTO repositories (
     "repoName"
 ) VALUES ($1, $2, $3);
 
+-- name: GetProjects :many
+SELECT "githubRepoId", "repoName" FROM repositories WHERE "userId" = $1;

@@ -52,7 +52,7 @@ func main() {
 	api.Use(middleware.Authenticate(store.Queries))
 	api.GET("/get-repos", handler.GetRepos)
 	api.POST("/import-repos", handler.ImportRepos)
-
+	api.GET("/get-projects", handler.GetProjects)
 	r.Run(":8080")
 
 	quit := make(chan os.Signal, 1)

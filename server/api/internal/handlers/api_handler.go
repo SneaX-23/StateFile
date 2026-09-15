@@ -73,3 +73,17 @@ func (h *Handler) ImportRepos(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "success", "message": fmt.Sprintf("Successfully imported %d repositories.", reposAdded)})
 }
+
+func (h *Handler) GetProjects(c *gin.Context) {
+	userId, exists := c.Get("userId")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found in context"})
+		return
+	}
+	projects, err := h.apiService.GetProjectsService(c.Request.Context(), userId.(string))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"projects": projects})
+}

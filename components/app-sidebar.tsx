@@ -82,8 +82,9 @@ const data = {
 }
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   projects?: Repo[]
+  limit: number
 }
-export function AppSidebar({ projects = [], ...props }: AppSidebarProps) {
+export function AppSidebar({ projects = [], limit, ...props }: AppSidebarProps) {
   const user = useCurrentUser()
   const formatedProjects = projects.map((p) => ({
     name: p.name,
@@ -96,7 +97,7 @@ export function AppSidebar({ projects = [], ...props }: AppSidebarProps) {
       {/* </SidebarHeader> */}
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={formatedProjects} />
+        <NavProjects projects={formatedProjects} limit={limit} />
       </SidebarContent>
       <SidebarFooter>
         {user && (

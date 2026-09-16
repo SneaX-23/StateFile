@@ -203,17 +203,34 @@ func (s *ApiService) ImportReposService(ctx context.Context, userId string, repo
 	return repoInserted, nil
 }
 
-func (s *ApiService) GetProjectsService(ctx context.Context, userId string) ([]Repositories, error) {
-	projects, err := s.repo.GetProjects(ctx, userId)
-	if err != nil {
-		return nil, err
-	}
-	formatedProjects := make([]Repositories, len(projects))
-	for i, project := range projects {
-		formatedProjects[i] = Repositories{
-			Id:   project.GithubRepoId,
-			Name: project.RepoName,
+func (s *ApiService) GetProjectsService(ctx context.Context, userId string) ([]Repositories, int32, error) {
+	var formattedProjects []Repositories
+	var repoLimit int32
+
+	err := s.repo.ExecTx(ctx, func(q *repository.Queries) error {
+		projects, err := q.GetProjects(ctx, userId)
+		if err != nil {
+			return err
 		}
+
+		formattedProjects = make([]Repositories, len(projects))
+		for i, project := range projects {
+			formattedProjects[i] = Repositories{
+				Id:   project.GithubRepoId,
+				Name: project.RepoName,
+			}
+		}
+
+		repoLimit, err = q.CheckRepoLimit(ctx, userId)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, 0, err
 	}
-	return formatedProjects, nil
+
+	return formattedProjects, repoLimit, nil
 }

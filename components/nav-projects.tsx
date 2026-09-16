@@ -21,14 +21,16 @@ import GetRepos from "./dashboard/get-repos-btn"
 
 export function NavProjects({
   projects,
+  limit
 }: {
   projects: {
     name: string
     icon: React.ReactNode
   }[]
+  limit: number
 }) {
   const { isMobile } = useSidebar()
-
+  const canImportMore = limit < 1;
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
@@ -75,7 +77,7 @@ export function NavProjects({
           </SidebarMenuItem>
         ))}
 
-        <GetRepos />
+        {canImportMore! && <GetRepos />}
       </SidebarMenu>
     </SidebarGroup>
   )

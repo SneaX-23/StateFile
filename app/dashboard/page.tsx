@@ -17,22 +17,26 @@ import { Repo } from "@/types/repos"
 import { apiFetch } from '@/lib/api';
 import BlueprintLayout from '@/components/ui/blueprint-layout';
 
-async function getProjects(): Promise<Repo[]> {
-  const data = await apiFetch<{ projects: Repo[] }>('/api/v1/get-projects',
+interface ProjectsResponce {
+  projects: Repo[];
+  limit: number
+}
+async function getProjects(): Promise<ProjectsResponce> {
+  const data = await apiFetch<{ projects: Repo[], limit: number }>('/api/v1/get-projects',
     {
       method: "GET",
       credentials: 'include',
       cache: 'no-store',
     })
-  return data.projects
+  return data
 }
 
 export default async function Page() {
-  const projects = await getProjects();
+  const data = await getProjects();
   return (
     <BlueprintLayout>
       <SidebarProvider>
-        <AppSidebar projects={projects} className="bg-transparent" />
+        <AppSidebar projects={data.projects} limit={data.limit} className="bg-transparent" />
         <SidebarInset className="bg-transparent">
           <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4">

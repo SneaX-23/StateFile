@@ -11,6 +11,7 @@ interface RepositoryComponentProps {
   onLoadMore: () => void;
   hasMore: boolean;
   onClose: () => void;
+  limit: number
 }
 
 const RepositoryComponent: React.FC<RepositoryComponentProps> = ({
@@ -20,11 +21,12 @@ const RepositoryComponent: React.FC<RepositoryComponentProps> = ({
   isLoading,
   onLoadMore,
   hasMore,
-  onClose
+  onClose,
+  limit
 }) => {
 
   // max selection variable
-  const MAX_SELECTION_LIMIT = 3;
+  const MAX_SELECTION_LIMIT = limit;
 
   const ITEMS_PER_PAGE = 5;
   const [currentPage, setCurrentPage] = useState(1);
@@ -69,7 +71,8 @@ const RepositoryComponent: React.FC<RepositoryComponentProps> = ({
       await apiFetch('/api/v1/import-repos', {
         method: 'POST',
         body: JSON.stringify({ repositories: selectedRepoNames }),
-        credentials: 'include'
+        credentials: 'include',
+        cache: 'no-store'
       });
       onClose();
       router.refresh()

@@ -4,7 +4,8 @@ import RepositoryComponent from './repository-component';
 import { Loader2, DownloadCloud } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 
-export default function GetRepos() {
+
+export default function GetRepos({ limit }: { limit: number }) {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -88,11 +89,11 @@ export default function GetRepos() {
           <span>
             {isLoading && repos.length === 0 ? 'Initializing...' : 'Select Repositories'}
           </span>
-          {selectedRepoIds.size > 0 && (
-            <span className="ml-auto bg-blue-600 text-white text-xs py-0.5 px-2 rounded-full font-bold">
-              {selectedRepoIds.size}
-            </span>
-          )}
+          {/* {selectedRepoIds.size > 0 && ( */}
+          {/*   <span className="ml-auto bg-blue-600 text-white text-xs py-0.5 px-2 rounded-full font-bold"> */}
+          {/*     {selectedRepoIds.size} */}
+          {/*   </span> */}
+          {/* )} */}
         </button>
 
         {error && (
@@ -112,6 +113,7 @@ export default function GetRepos() {
           onLoadMore={handleLoadMore}
           hasMore={hasMore}
           onClose={() => setIsOpen(false)}
+          limit={limit}
         />
       )}
     </>

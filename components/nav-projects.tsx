@@ -77,7 +77,7 @@ export function NavProjects({
           </SidebarMenuItem>
         ))}
 
-        {canImportMore! && <GetRepos />}
+        {!canImportMore && <GetRepos limit={limit} />}
       </SidebarMenu>
     </SidebarGroup>
   )
